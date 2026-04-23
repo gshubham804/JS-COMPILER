@@ -28,6 +28,7 @@
 | **Status bar** | Active file, indent/encoding hint, saved/unsaved. |
 | **Persistence** | Workspace (files, panes, layout ratio, theme, editor settings, etc.) is stored in **`localStorage`** under the key `jsc-compiler-v1`. |
 | **Share URL** | Copies a link with a `#p=` fragment (Base64-encoded JSON: `files`, `panes`, `outputPaneRatio`). Opening that link restores the snapshot. |
+| **Import / export** | **Upload** (arrow up): open a `.json` project file exported by JSC. **Download** (arrow down): save `jsc-project-YYYY-MM-DD.json` with the full workspace (`jsc: true`, files, panes, layout, theme, editor settings). |
 
 ## How the preview works
 
@@ -43,6 +44,7 @@
 ## Project structure
 
 ```
+netlify.toml            # Build command, publish dir, SPA redirect (Netlify)
 src/
   App.tsx                 # Shell, state, persistence, layout
   main.tsx
@@ -72,6 +74,8 @@ npm run build     # typecheck + production bundle → dist/
 npm run preview   # serve dist/ locally
 npm run lint      # ESLint
 ```
+
+**Netlify:** import the site from this repo; `netlify.toml` sets the build to `npm run build`, output to `dist/`, and a SPA fallback to `index.html`.
 
 ## Requirements
 

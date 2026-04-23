@@ -1,0 +1,15 @@
+# https://docs.netlify.com/build/configure-builds/file-based-build-configuration/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Match Netlify LTS; override in the UI if needed
+  NODE_VERSION = "20"
+
+# Single-page app: client-side routes fall back to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -6,6 +6,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import type { ChangeEvent } from 'react';
+import { Check } from 'lucide-react';
 import { HeaderBar } from './components/HeaderBar';
 import { FilesSidebar } from './components/FilesSidebar';
 import { WorkspaceResizer } from './components/WorkspaceResizer';
@@ -17,6 +19,11 @@ import {
 import { StatusBarRow } from './components/StatusBarRow';
 import { SettingsModal } from './components/SettingsModal';
 import { buildPreviewDocument } from './lib/previewDocument';
+import {
+  buildExportData,
+  downloadProjectJson,
+  parseProjectFile,
+} from './lib/projectFile';
 import { DEFAULT_FILES } from './constants/defaultProject';
 import type {
   OutgoingConsoleMessage,
@@ -28,6 +35,7 @@ import type {
 const STORAGE = 'jsc-compiler-v1';
 const RUN_DEBOUNCE_MS = 420;
 const SAVE_DEBOUNCE_MS = 500;
+const LINK_COPIED_TOAST_MS = 2600;
 
 const DEFAULT_PANES: PaneVisibility = {
   html: true,
@@ -183,17 +191,22 @@ function App() {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const runTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const linkCopiedToastTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const [linkCopiedToast, setLinkCopiedToast] = useState(false);
 
   const setFile = (name: SourceFile, v: string) => {
     setFiles((f) => ({ ...f, [name]: v }));
     setSaved(false);
   };
 
-  const run = useCallback(() => {
+  const run = useCallback((fileOverride?: ProjectFiles) => {
+    const f = fileOverride ?? files;
     const doc = buildPreviewDocument(
-      files['index.html'],
-      files['style.css'],
-      files['script.js']
+      f['index.html'],
+      f['style.css'],
+      f['script.js']
     );
     setSrcDoc(doc);
     setIframeKey((k) => k + 1);
@@ -267,6 +280,15 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [run]);
 
+  useEffect(() => {
+    return () => {
+      if (linkCopiedToastTimer.current) {
+        clearTimeout(linkCopiedToastTimer.current);
+        linkCopiedToastTimer.current = null;
+      }
+    };
+  }, []);
+
   const onShare = useCallback(() => {
     const payload = btoa(
       unescape(
@@ -276,8 +298,114 @@ function App() {
       )
     );
     const url = `${location.origin}${location.pathname}#p=${payload}`;
-    void navigator.clipboard.writeText(url);
+    void navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        if (linkCopiedToastTimer.current) {
+          clearTimeout(linkCopiedToastTimer.current);
+        }
+        setLinkCopiedToast(true);
+        linkCopiedToastTimer.current = setTimeout(() => {
+          setLinkCopiedToast(false);
+          linkCopiedToastTimer.current = null;
+        }, LINK_COPIED_TOAST_MS);
+      })
+      .catch(() => {
+        window.alert(
+          'Could not copy the link. Your browser may block clipboard access on this page.'
+        );
+      });
   }, [files, panes, outputPaneRatio]);
+
+  const onDownload = useCallback(() => {
+    const data = buildExportData({
+      files,
+      panes,
+      outputPaneRatio,
+      autoRun,
+      isDark,
+      fontSize,
+      tabSize,
+      lineNumbers,
+    });
+    const day = new Date().toISOString().slice(0, 10);
+    downloadProjectJson(data, `jsc-project-${day}.json`);
+    setSaved(true);
+  }, [
+    files,
+    panes,
+    outputPaneRatio,
+    autoRun,
+    isDark,
+    fontSize,
+    tabSize,
+    lineNumbers,
+  ]);
+
+  const importInputRef = useRef<HTMLInputElement | null>(null);
+  const onUploadClick = useCallback(() => {
+    importInputRef.current?.click();
+  }, []);
+
+  const onImportFile = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result ?? '');
+        const parsed = parseProjectFile(text);
+        if ('error' in parsed) {
+          window.alert(parsed.error);
+          return;
+        }
+        const d = parsed.data;
+        setFiles(d.files);
+        setPanes(d.panes);
+        setOutputPaneRatio(d.outputPaneRatio);
+        setAutoRun(d.autoRun);
+        setIsDark(d.isDark);
+        setFontSize(d.fontSize);
+        setTabSize(d.tabSize);
+        setLineNumbers(d.lineNumbers);
+        if (d.panes.js) {
+          setActiveFile('script.js');
+        } else if (d.panes.html) {
+          setActiveFile('index.html');
+        } else if (d.panes.css) {
+          setActiveFile('style.css');
+        } else {
+          setActiveFile('script.js');
+        }
+        setLines([]);
+        setSaved(true);
+        run(d.files);
+        try {
+          localStorage.setItem(
+            STORAGE,
+            JSON.stringify({
+              files: d.files,
+              autoRun: d.autoRun,
+              isDark: d.isDark,
+              fontSize: d.fontSize,
+              tabSize: d.tabSize,
+              lineNumbers: d.lineNumbers,
+              panes: d.panes,
+              outputPaneRatio: d.outputPaneRatio,
+            })
+          );
+        } catch {
+          /* ignore */
+        }
+      };
+      reader.onerror = () => {
+        window.alert('Could not read the file.');
+      };
+      reader.readAsText(file, 'utf-8');
+    },
+    [run]
+  );
 
   const onTogglePane = (key: keyof PaneVisibility) => {
     setPanes((p) => ({ ...p, [key]: !p[key] }));
@@ -319,16 +447,26 @@ function App() {
         ' flex min-w-0 flex-col'
       }
     >
+      <input
+        ref={importInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="sr-only"
+        onChange={onImportFile}
+        aria-label="Import JSC project file"
+        tabIndex={-1}
+      />
       <HeaderBar
         autoRun={autoRun}
         onAutoRun={setAutoRun}
-        onRun={run}
+        onRun={() => {
+          run();
+        }}
         isDark={isDark}
         onToggleTheme={() => setIsDark((d) => !d)}
+        onUpload={onUploadClick}
+        onDownload={onDownload}
         onShare={onShare}
-        onSave={() => {
-          setSaved(true);
-        }}
         onOpenSettings={() => setSettingsOpen(true)}
       />
       <div className="flex min-h-0 min-w-0 flex-1">
@@ -430,6 +568,32 @@ function App() {
           )}
         </div>
       </div>
+      {linkCopiedToast && (
+        <div
+          className="pointer-events-none fixed top-14 left-1/2 z-100 -translate-x-1/2 px-3"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className={
+              isDark
+                ? 'inline-flex max-w-md items-center gap-2 rounded-lg border border-jsc-border bg-jsc-elev/95 px-3 py-2 text-sm text-jsc-text shadow-lg backdrop-blur-sm'
+                : 'inline-flex max-w-md items-center gap-2 rounded-lg border border-zinc-200 bg-white/95 px-3 py-2 text-sm text-zinc-800 shadow-lg backdrop-blur-sm'
+            }
+          >
+            <Check
+              className={
+                isDark
+                  ? 'h-4 w-4 shrink-0 text-emerald-400'
+                  : 'h-4 w-4 shrink-0 text-emerald-600'
+              }
+              strokeWidth={2.25}
+              aria-hidden
+            />
+            <span>Link copied to clipboard</span>
+          </div>
+        </div>
+      )}
       <StatusBarRow
         activeFile={activeFile}
         isDark={isDark}
