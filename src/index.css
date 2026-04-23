@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --color-jsc-bg: #0b0e14;
+  --color-jsc-surface: #0f1117;
+  --color-jsc-elev: #13161c;
+  --color-jsc-border: #1e2229;
+  --color-jsc-muted: #5c6370;
+  --color-jsc-text: #c8ccd4;
+  --color-jsc-heading: #e6e8ec;
+  --color-jsc-accent: #3b82f6;
+  --color-jsc-sidebar-active: #1a1f2e;
+  --color-jsc-pro: #1e2636;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  @apply antialiased text-jsc-text bg-jsc-bg;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Monaco fills flex parent */
+.monaco-wrap {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Custom scrollbar to match dark IDE */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2a2f3a;
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
