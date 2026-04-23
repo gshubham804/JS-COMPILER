@@ -70,7 +70,10 @@ export function BottomPanes({
     <>
       <div
         className={
-          'h-full w-full min-h-0 grid ' + (twoCol ? 'grid-cols-2' : 'grid-cols-1')
+          'grid h-full w-full min-h-0 ' +
+          (twoCol
+            ? 'grid-cols-1 md:grid-cols-2'
+            : 'grid-cols-1')
         }
       >
         {showConsole && (
@@ -78,7 +81,7 @@ export function BottomPanes({
             className={
               'flex min-h-0 min-w-0 flex-col border-t ' +
               a +
-              (twoCol ? ' border-r' : '')
+              (twoCol ? ' md:border-r' : '')
             }
           >
             <div

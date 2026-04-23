@@ -70,7 +70,7 @@ export function WorkspaceResizer({
         (isDark
           ? 'border-t border-b border-jsc-border/80 bg-jsc-elev/40 hover:border-jsc-accent/50'
           : 'border-t border-b border-zinc-200/90 bg-zinc-100/80 hover:border-blue-300') +
-        ' h-1.5 shrink-0 cursor-row-resize'
+        ' h-1.5 min-h-2.5 shrink-0 touch-manipulation cursor-row-resize py-0.5 md:min-h-0 md:py-0'
       }
       onPointerDown={onPointerDown}
       role="separator"

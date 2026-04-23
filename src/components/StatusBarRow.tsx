@@ -14,8 +14,8 @@ const LANG: Record<SourceFile, string> = {
 
 export function StatusBarRow({ activeFile, isDark, saved }: Props) {
   const bar = isDark
-    ? 'h-6 shrink-0 border-t border-jsc-border bg-jsc-elev/90'
-    : 'h-6 shrink-0 border-t border-zinc-200 bg-zinc-100';
+    ? 'min-h-6 shrink-0 border-t border-jsc-border bg-jsc-elev/90 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))]'
+    : 'min-h-6 shrink-0 border-t border-zinc-200 bg-zinc-100 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))]';
   const item = isDark ? 'text-jsc-muted' : 'text-zinc-500';
   return (
     <div

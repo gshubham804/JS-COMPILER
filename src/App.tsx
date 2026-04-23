@@ -195,6 +195,7 @@ function App() {
     null
   );
   const [linkCopiedToast, setLinkCopiedToast] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const setFile = (name: SourceFile, v: string) => {
     setFiles((f) => ({ ...f, [name]: v }));
@@ -287,6 +288,33 @@ function App() {
         linkCopiedToastTimer.current = null;
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileSidebarOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileSidebarOpen]);
+
+  useEffect(() => {
+    if (!mobileSidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileSidebarOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileSidebarOpen]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = () => {
+      if (mq.matches) setMobileSidebarOpen(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   const onShare = useCallback(() => {
@@ -410,6 +438,7 @@ function App() {
   const onTogglePane = (key: keyof PaneVisibility) => {
     setPanes((p) => ({ ...p, [key]: !p[key] }));
     setSaved(false);
+    setMobileSidebarOpen(false);
   };
 
   const onSelectFile = (f: SourceFile) => {
@@ -421,6 +450,7 @@ function App() {
       setPanes((p) => ({ ...p, js: true }));
     }
     setActiveFile(f);
+    setMobileSidebarOpen(false);
   };
 
   const onClear = () => {
@@ -436,6 +466,12 @@ function App() {
   const canResizeWorkspace = hasEditors && hasOutput;
   const visibleEditors = EDITOR_PANES.filter((e) => panes[e.key]);
   const editorCount = visibleEditors.length;
+  const editorGridClass =
+    editorCount <= 1
+      ? 'md:grid-cols-1'
+      : editorCount === 2
+        ? 'md:grid-cols-2'
+        : 'md:grid-cols-3';
 
   return (
     <div
@@ -467,15 +503,31 @@ function App() {
         onUpload={onUploadClick}
         onDownload={onDownload}
         onShare={onShare}
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={() => {
+          setSettingsOpen(true);
+          setMobileSidebarOpen(false);
+        }}
+        onOpenPanesMenu={() => setMobileSidebarOpen(true)}
       />
-      <div className="flex min-h-0 min-w-0 flex-1">
+      <div className="relative flex min-h-0 min-w-0 flex-1">
+        {mobileSidebarOpen && (
+          <button
+            type="button"
+            className="fixed inset-0 z-40 touch-manipulation bg-black/45 md:hidden"
+            aria-label="Close menu"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+        )}
         <FilesSidebar
           activeFile={activeFile}
           onSelectFile={onSelectFile}
           isDark={isDark}
           panes={panes}
           onTogglePane={onTogglePane}
+          autoRun={autoRun}
+          onAutoRun={setAutoRun}
+          mobileOpen={mobileSidebarOpen}
+          onRequestClose={() => setMobileSidebarOpen(false)}
         />
         <div
           ref={workspaceRef}
@@ -483,7 +535,7 @@ function App() {
         >
           {hasEditors && (
             <div
-              className="flex min-h-0 min-w-0 flex-col"
+              className="flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden md:overflow-hidden"
               style={
                 canResizeWorkspace
                   ? { flex: `${1 - outputPaneRatio} 1 0%`, minHeight: 0 }
@@ -491,10 +543,11 @@ function App() {
               }
             >
               <div
-                className="grid h-full min-h-0 min-w-0 flex-1"
-                style={{
-                  gridTemplateColumns: `repeat(${editorCount}, minmax(0, 1fr))`,
-                }}
+                className={
+                  'grid min-h-0 min-w-0 flex-1 grid-cols-1 ' +
+                  editorGridClass +
+                  ' max-md:h-auto max-md:min-h-0 md:h-full'
+                }
               >
                 {visibleEditors.map((e, i) => (
                   <EditorColumn
@@ -507,7 +560,7 @@ function App() {
                     tabSize={tabSize}
                     lineNumbers={lineNumbers}
                     onFocus={() => setActiveFile(e.file)}
-                    showRightBorder={i < editorCount - 1}
+                    hasSeparatorAfter={i < editorCount - 1}
                   />
                 ))}
               </div>
@@ -570,7 +623,7 @@ function App() {
       </div>
       {linkCopiedToast && (
         <div
-          className="pointer-events-none fixed top-14 left-1/2 z-100 -translate-x-1/2 px-3"
+          className="pointer-events-none fixed top-[max(1rem,env(safe-area-inset-top,0px)+3.25rem)] left-1/2 z-100 -translate-x-1/2 px-3 sm:top-14"
           role="status"
           aria-live="polite"
         >

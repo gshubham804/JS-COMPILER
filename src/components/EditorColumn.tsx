@@ -12,7 +12,8 @@ type Props = {
   tabSize: number;
   lineNumbers: boolean;
   onFocus: () => void;
-  showRightBorder: boolean;
+  /** Column separator: right on desktop, bottom when stacked (mobile). */
+  hasSeparatorAfter: boolean;
 };
 
 const LANG: Record<SourceFile, string> = {
@@ -30,7 +31,7 @@ export function EditorColumn({
   tabSize,
   lineNumbers,
   onFocus,
-  showRightBorder,
+  hasSeparatorAfter,
 }: Props) {
   const monacoRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
@@ -62,9 +63,10 @@ export function EditorColumn({
   return (
     <div
       className={
-        'flex h-full min-w-0 min-h-0 flex-1 flex-col ' +
+        'flex h-full min-h-[200px] min-w-0 flex-1 flex-col md:min-h-0 ' +
         edge +
-        (showRightBorder ? ' border-r' : '')
+        (hasSeparatorAfter ? ' max-md:border-b md:border-r' : '') +
+        ' max-md:border-r-0'
       }
     >
       <div

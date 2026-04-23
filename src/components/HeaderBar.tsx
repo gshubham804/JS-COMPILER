@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import {
   Download,
   Link2,
+  Menu,
   Moon,
   Play,
   Settings,
@@ -19,6 +20,8 @@ type Props = {
   onDownload: () => void;
   onShare: () => void;
   onOpenSettings: () => void;
+  /** If set, shows a menu control (visible below `md`) to open the panes drawer */
+  onOpenPanesMenu?: () => void;
 };
 
 function headerIconClass(isDark: boolean) {
@@ -76,6 +79,7 @@ export function HeaderBar({
   onDownload,
   onShare,
   onOpenSettings,
+  onOpenPanesMenu,
 }: Props) {
   const ic = headerIconClass(isDark);
   const tc = themeToggleIconClass(isDark);
@@ -83,12 +87,33 @@ export function HeaderBar({
   return (
     <header
       className={
-        isDark
-          ? 'flex h-[52px] shrink-0 items-center justify-between border-b border-jsc-border bg-jsc-surface px-4'
-          : 'flex h-[52px] shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4'
+        (isDark
+          ? 'flex min-h-[52px] shrink-0 items-center justify-between border-b border-jsc-border bg-jsc-surface'
+          : 'flex min-h-[52px] shrink-0 items-center justify-between border-b border-zinc-200 bg-white') +
+        ' gap-2 px-2 py-1 sm:px-4 sm:py-0' +
+        ' pt-[max(0.25rem,env(safe-area-inset-top,0px))]'
       }
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        {onOpenPanesMenu && (
+          <button
+            type="button"
+            onClick={onOpenPanesMenu}
+            aria-label="Open panes and workspace menu"
+            className={
+              (isDark
+                ? 'shrink-0 touch-manipulation rounded-md border border-jsc-border bg-jsc-elev/80 p-2 text-jsc-text hover:border-jsc-muted'
+                : 'shrink-0 touch-manipulation rounded-md border border-zinc-200 bg-white p-2 text-zinc-800 shadow-sm hover:border-zinc-300') +
+              ' min-h-11 min-w-11 md:hidden'
+            }
+          >
+            <Menu
+              className={isDark ? 'h-5 w-5' : 'h-5 w-5 text-zinc-700'}
+              strokeWidth={1.75}
+              aria-hidden
+            />
+          </button>
+        )}
         <a
           href="/"
           className="flex min-w-0 items-center gap-2 no-underline"
@@ -156,8 +181,8 @@ export function HeaderBar({
         </label>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1 sm:gap-2">
+        <div className="flex min-w-0 items-center gap-0.5 sm:gap-2">
           <IconBtn
             label="Import project (JSON)"
             isDark={isDark}
@@ -193,8 +218,10 @@ export function HeaderBar({
         <button
           type="button"
           onClick={onRun}
+          aria-label="Run preview (Ctrl+Enter)"
+          title="Run (Ctrl+Enter)"
           className={
-            'inline-flex items-center gap-2 rounded-md bg-jsc-accent px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:outline-none ' +
+            'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md bg-jsc-accent px-3 py-2 text-sm font-semibold text-white shadow-sm touch-manipulation transition hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:outline-none sm:min-h-0 sm:min-w-0 sm:px-4 sm:py-2 ' +
             (isDark
               ? 'focus:ring-offset-jsc-surface'
               : 'focus:ring-offset-white')
@@ -205,7 +232,7 @@ export function HeaderBar({
             strokeWidth={2}
             aria-hidden
           />
-          Run
+          <span className="max-sm:sr-only">Run</span>
           <span
             className={
               isDark
