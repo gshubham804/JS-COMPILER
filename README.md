@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+<p align="center">
+  <img src="public/jsc-mark.svg" alt="JSC" width="72" height="72" />
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1 align="center">JSC</h1>
 
-Currently, two official plugins are available:
+<p align="center"><strong>Live JavaScript workspace</strong> in the browser.</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+<p align="center">
+  Edit <code>index.html</code>, <code>style.css</code>, and <code>script.js</code> side by side, run the combined result in a sandboxed <strong>Preview</strong>, and read <strong>Console</strong> output from your preview code (output comes from <strong>script.js</strong> / the merged page — there is no separate “run JS in the console” box).
+</p>
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+| Area | What it does |
+|------|----------------|
+| **Editors** | Three panes for HTML, CSS, and JavaScript, powered by **Monaco** (VS Code–style editing). |
+| **Preview** | Builds a single document from your three files (inlines CSS/JS, injects a small console bridge) and runs it in a **sandboxed iframe**. |
+| **Console** | Read-only: shows `console.log` / `warn` / `error` and uncaught errors from the preview. **Clear** empties the log. |
+| **Panes** | Toggle visibility of HTML, CSS, JS, Console, and Preview in the sidebar — e.g. only JavaScript + Console for a minimal layout. |
+| **Resize** | When both editors and at least one of Console/Preview are visible, drag the **horizontal bar** between the editor block and the output block to change their height split (ratio is persisted). |
+| **Run** | Runs the preview (refreshes the iframe). **Auto-run** debounces and re-runs when files change (~420 ms). |
+| **Shortcuts** | **Ctrl+Enter** (Windows/Linux) or **⌘+Enter** (macOS) runs the preview. |
+| **Header** | Share (copies a URL with encoded state), Save (marks saved; state also auto-saves), Settings, light/dark theme. |
+| **Settings** | Font size, tab size, line numbers (for the editors). |
+| **Status bar** | Active file, indent/encoding hint, saved/unsaved. |
+| **Persistence** | Workspace (files, panes, layout ratio, theme, editor settings, etc.) is stored in **`localStorage`** under the key `jsc-compiler-v1`. |
+| **Share URL** | Copies a link with a `#p=` fragment (Base64-encoded JSON: `files`, `panes`, `outputPaneRatio`). Opening that link restores the snapshot. |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## How the preview works
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+`src/lib/previewDocument.ts` strips the normal `<link href="style.css">` and `<script src="script.js">` references, injects your CSS into `<style>` and your JS before `</body>` (uses `type="module"` when your `script.js` starts with `import`), and prepends a bridge so `console.*` can be shown in the app’s Console panel.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React** 19 · **TypeScript** · **Vite** 8  
+- **Tailwind CSS** v4 (`@tailwindcss/vite`)  
+- **Monaco Editor** (`@monaco-editor/react`, `monaco-editor`)  
+- **ESLint** (TypeScript + React hooks / refresh)
+
+## Project structure
+
+```
+src/
+  App.tsx                 # Shell, state, persistence, layout
+  main.tsx
+  index.css
+  types.ts
+  constants/defaultProject.ts   # Default HTML/CSS/JS starter
+  lib/previewDocument.ts        # Merge files → iframe srcdoc
+  components/
+    HeaderBar.tsx
+    FilesSidebar.tsx
+    EditorColumn.tsx
+    BottomPanes.tsx        # Console + Preview (or off-screen iframe)
+    WorkspaceResizer.tsx
+    StatusBarRow.tsx
+    SettingsModal.tsx
+public/
+  jsc-mark.svg           # App logo
+  favicon.svg
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev       # dev server (default: http://localhost:5173)
+npm run build     # typecheck + production bundle → dist/
+npm run preview   # serve dist/ locally
+npm run lint      # ESLint
 ```
+
+## Requirements
+
+- **Node.js** (LTS recommended) and **npm**
+
+## Branding
+
+| Asset | Path |
+|--------|------|
+| Logo | `public/jsc-mark.svg` |
+| Favicon | `public/favicon.svg` |
+
+Page title (see `index.html`): **JSC — live JavaScript workspace**.
+
+---
+
+Add a `LICENSE` if you publish or open-source the repository.
