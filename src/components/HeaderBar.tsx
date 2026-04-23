@@ -123,18 +123,18 @@ export function HeaderBar({
             src="/jsc-mark.svg"
             width={28}
             height={28}
-            alt=""
+            alt="JSC"
             className="h-7 w-7 shrink-0"
           />
-          <span
+          <h1
             className={
               isDark
-                ? 'whitespace-nowrap text-[16px] font-bold tracking-tight text-jsc-heading'
-                : 'whitespace-nowrap text-[16px] font-bold tracking-tight text-zinc-900'
+                ? 'm-0 whitespace-nowrap text-[16px] font-bold tracking-tight text-jsc-heading'
+                : 'm-0 whitespace-nowrap text-[16px] font-bold tracking-tight text-zinc-900'
             }
           >
             JSC
-          </span>
+          </h1>
         </a>
         <div
           className={

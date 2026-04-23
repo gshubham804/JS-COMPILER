@@ -2,20 +2,168 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta
+      name="color-scheme"
+      content="dark light"
+    />
+    <title>
+      JSC — free online JavaScript, HTML &amp; CSS editor in the browser
+    </title>
+    <meta
+      name="description"
+      content="JSC is a free in-browser code workspace: edit HTML, CSS, and JavaScript with Monaco, run a live preview in a sandboxed iframe, share projects via a link, and use import/export. Works on desktop and mobile; no sign-up required."
+    />
+    <meta
+      name="keywords"
+      content="JavaScript editor online, HTML CSS JavaScript playground, code sandbox, web IDE, Monaco editor, browser JavaScript, live preview, run JavaScript in browser, JS playground, free online code editor, front-end development tools"
+    />
+    <meta name="author" content="JSC" />
+    <meta name="creator" content="JSC" />
+    <meta name="publisher" content="JSC" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="format-detection"
+      content="telephone=no, address=no, email=no"
+    />
+    <meta name="application-name" content="JSC" />
+    <meta
+      name="theme-color"
+      content="#0b0e14"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta
+      name="theme-color"
+      content="#f4f4f5"
+      media="(prefers-color-scheme: light)"
+    />
+
+    <link rel="canonical" href="__SITE_URL__/" />
+    <link rel="alternate" hreflang="en" href="__SITE_URL__/" />
+    <link rel="alternate" hreflang="x-default" href="__SITE_URL__/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="mask-icon" href="/jsc-mark.svg" color="#3b82f6" />
+    <link
+      rel="apple-touch-icon"
+      href="/jsc-mark.svg"
+      type="image/svg+xml"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>JSC — live JavaScript workspace</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JSC" />
+    <meta
+      property="og:title"
+      content="JSC — free online JavaScript, HTML &amp; CSS editor"
+    />
+    <meta
+      property="og:description"
+      content="Edit and run JavaScript, HTML, and CSS in the browser. Live preview, Monaco editor, project share links, and import/export — no sign-up required."
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="__SITE_URL__/jsc-mark.svg"
+    />
+    <meta
+      property="og:image:alt"
+      content="JSC — live JavaScript workspace"
+    />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta
+      name="twitter:card"
+      content="summary_large_image"
+    />
+    <meta
+      name="twitter:title"
+      content="JSC — free online JavaScript, HTML &amp; CSS editor"
+    />
+    <meta
+      name="twitter:description"
+      content="Edit and run JavaScript, HTML, and CSS in the browser. Live preview, Monaco editor, and shareable project links."
+    />
+    <meta
+      name="twitter:image"
+      content="__SITE_URL__/jsc-mark.svg"
+    />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "__SITE_URL__/#website",
+          "name": "JSC",
+          "url": "__SITE_URL__/",
+          "description": "Free in-browser workspace to edit and run JavaScript, HTML, and CSS with a live preview and project sharing.",
+          "inLanguage": "en",
+          "publisher": { "@id": "__SITE_URL__/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "__SITE_URL__/#organization",
+          "name": "JSC",
+          "url": "__SITE_URL__/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "__SITE_URL__/jsc-mark.svg"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "__SITE_URL__/#app",
+          "name": "JSC",
+          "url": "__SITE_URL__/",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Web browser (any modern OS)",
+          "description": "Browser-based code editor and playground: Monaco editors for HTML, CSS, and JavaScript, sandboxed live preview, console from preview, and shareable state via URL hash.",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "browserRequirements": "Requires JavaScript. Modern evergreen browser (Chrome, Firefox, Safari, Edge).",
+          "image": "__SITE_URL__/jsc-mark.svg"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
+    <noscript>
+      <p>
+        <strong>JSC</strong> is a free online JavaScript, HTML, and CSS workspace that runs in
+        your browser. Please enable JavaScript to use the editor, live preview, and
+        import/export. If you are a search engine, the app shell loads after JS runs.
+      </p>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

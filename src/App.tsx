@@ -483,6 +483,17 @@ function App() {
         ' flex min-w-0 flex-col'
       }
     >
+      <a
+        href="#main-content"
+        className={
+          'fixed top-0 left-2 z-200 -translate-y-full rounded-b-md ' +
+          'bg-jsc-accent px-3 py-2 text-sm font-medium text-white shadow-lg ' +
+          'transition-transform focus:translate-y-0 focus:outline-2 focus:outline-offset-2 ' +
+          'focus:outline-white'
+        }
+      >
+        Skip to main content
+      </a>
       <input
         ref={importInputRef}
         type="file"
@@ -509,6 +520,11 @@ function App() {
         }}
         onOpenPanesMenu={() => setMobileSidebarOpen(true)}
       />
+      <main
+        id="main-content"
+        className="flex min-h-0 min-w-0 flex-1 flex-col outline-none"
+        tabIndex={-1}
+      >
       <div className="relative flex min-h-0 min-w-0 flex-1">
         {mobileSidebarOpen && (
           <button
@@ -652,6 +668,7 @@ function App() {
         isDark={isDark}
         saved={saved}
       />
+      </main>
       <SettingsModal
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}

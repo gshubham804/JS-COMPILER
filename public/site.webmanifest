@@ -1,0 +1,10 @@
+{
+  "name": "JSC — live JavaScript workspace",
+  "short_name": "JSC",
+  "description": "Edit HTML, CSS, and JavaScript in the browser with a live preview.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "lang": "en"
+}

@@ -63,6 +63,9 @@ src/
 public/
   jsc-mark.svg           # App logo
   favicon.svg
+  site.webmanifest
+.env.production
+.env.example            # VITE_PUBLIC_SITE_URL, optional Google verification
 ```
 
 ## Scripts
@@ -75,7 +78,15 @@ npm run preview   # serve dist/ locally
 npm run lint      # ESLint
 ```
 
-**Netlify:** import the site from this repo; `netlify.toml` sets the build to `npm run build`, output to `dist/`, and a SPA fallback to `index.html`.
+**Netlify & URL:** the production app is at [https://tryjsc.netlify.app](https://tryjsc.netlify.app/). `netlify.toml` sets `VITE_PUBLIC_SITE_URL` to that origin (no trailing slash) so each build has correct canonical, Open Graph, sitemap, and JSON-LD. `.env.production` matches for local `npm run build`. Override the variable in **Netlify → Site → Environment** if you add a custom domain. For **Google Search Console** verification, add `VITE_GOOGLE_SITE_VERIFICATION` (optional).
+
+## Search & SEO (Google)
+
+- **`index.html`**: `meta` description, keywords, `robots` / `googlebot`, `theme-color`, canonical, `hreflang`, Open Graph, Twitter cards, and JSON-LD (`WebSite`, `Organization`, `WebApplication`).
+- **Build** writes **`robots.txt`** and **`sitemap.xml`** to `dist/` with your public URL.
+- **UX**: one `<h1>` in the app shell, a **skip to main** link, and `<main id="main-content">` for the workspace.
+- **`public/site.webmanifest`**: PWA-style metadata for the browser and richer install prompts.
+- **Next steps in Google:** submit [https://tryjsc.netlify.app/sitemap.xml](https://tryjsc.netlify.app/sitemap.xml) in [Search Console](https://search.google.com/search-console) (or your custom domain sitemap if you add one), and (optional) add a **1200×630** PNG (e.g. `public/og.png`) and point `og:image` / `twitter:image` in `index.html` for richer link previews.
 
 ## Requirements
 
@@ -88,7 +99,7 @@ npm run lint      # ESLint
 | Logo | `public/jsc-mark.svg` |
 | Favicon | `public/favicon.svg` |
 
-Page title (see `index.html`): **JSC — live JavaScript workspace**.
+Page title and meta tags: see `index.html` (includes SEO, social, and JSON-LD).
 
 ---
 
